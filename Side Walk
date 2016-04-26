@@ -1,0 +1,13 @@
+ class Node {
+
+	String txt;
+	int num;
+	String fulltext;
+	
+	public Node(String t)
+	{
+		fulltext = t;
+		txt = "";
+		num = 0;
+	}
+}
