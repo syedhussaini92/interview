@@ -1,0 +1,161 @@
+class FileRead {
+
+	public static void main(String[] args) {
+		try {
+			File file = new File("test.txt");// Take input from the file test
+			FileReader fileReader = new FileReader(file);
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			ArrayList<String> list = new ArrayList<String>();
+			String line;
+			while ((line = bufferedReader.readLine()) != null) {
+				list.add(line);// Store it in an ArrayList
+			}
+			fileReader.close();			
+			Node[] arr = loadArray(list);// Process the Elements in the list
+			
+			// Store the elements in the file
+			FileWriter fstream = new FileWriter("output.txt", false);
+	        BufferedWriter out = new BufferedWriter(fstream);
+	        for(int i = 0; i< arr.length; i++)
+	        {
+	        	out.write(arr[i].fulltext);
+	        	out.newLine();
+	        	System.out.println(arr[i].fulltext);// Print the elements for simplicity
+	        }
+	        out.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	//Create a Node class which contains the two variables storing the numeric part as well as the string part of the text
+	public static Node[] loadArray(ArrayList<String> list )
+	{
+		int n = list.size();
+		Node[] arr =  new Node[n];
+		for(int i = 0; i< n; i++)
+		{
+			String temp = list.get(i);
+			if(temp.trim().length() == 0)
+				continue;
+			String txt = "";
+			String num = "";
+			for(int j = 0; j< temp.length(); j++)
+			{
+				if( Character.isSpaceChar(temp.charAt(j)))
+					continue;
+				if(Character.isDigit(temp.charAt(j)))
+					num += Character.toString(temp.charAt(j));//if the character is a number then store in num variable
+				else
+					txt += Character.toString(temp.charAt(j));//if the character is a string then store in txt variable
+			}
+			Node x =  new Node(temp);
+			x.num = Integer.parseInt(num);
+			x.txt = txt;
+			x.txt = sort(x.txt);// sort the text
+			txt = x.txt;
+			// Append the sorted text to the full text
+			int k = 0;
+			int start = 0;
+			int end = 0;
+			while( k < temp.length())
+			{
+				char z = temp.charAt(k);
+				if( Character.isSpaceChar(z) || Character.isDigit(z))
+					k++;
+				else
+				{
+					start = k;
+					end = k + txt.length()- 1;
+					break;
+				}
+			}
+			char[] txt2 = temp.toCharArray();
+			int m = 0;
+			for(k = start; k <= end; k++)
+			{
+				txt2[k] = txt.charAt(m);
+				m++;
+			}
+			x.fulltext = String.valueOf(txt2);
+			arr[i] = x;
+		}
+		
+		// sort the array of nodes based on their numeric values
+		sortNodes(arr, 0, n-1);
+		// return the array
+		return arr;
+	}
+	
+	// Utility function to sort the array of nodes based on their numeric value ( using quicksort)
+	public static void sortNodes(Node[] arr, int l , int r)
+	{
+		if(l < r)
+		{
+			int p = pivot(arr, l , r);
+			sortNodes(arr, l , p-1);
+			sortNodes(arr, p+1, r);
+		}
+	}
+	
+	public static int pivot(Node[] arr , int l ,int r)
+	{
+		Node p = arr[r];
+		int i = l - 1;
+		Node t = null;
+		for(int j = l; j< r; j++)
+		{
+			if(arr[j].num < p.num)
+			{
+				i++;
+				t = arr[i];
+				arr[i] = arr[j];
+				arr[j] = t;
+			}
+		}
+		i++;
+		t = arr[i];
+		arr[i] = arr[r];
+		arr[r] = t;
+		return i;
+	}
+	
+	
+	public static String sort(String txt)
+	{
+		char[] str = txt.toCharArray();
+		qsort(str, 0 , str.length - 1);
+		txt = String.valueOf(str);
+		return txt;
+	}
+	
+	public static void qsort(char[] x, int l , int r)
+	{
+		if(r < l)
+			return;
+		int p = partition(x, l, r);
+		qsort(x, l, p-1);
+		qsort(x, p+1,r);
+	}
+	
+	public static int partition(char[] str, int l , int r)
+	{
+		char c =Character.toLowerCase(str[r]);
+		int i = l;
+		for( int j = l; j <= r; j++)
+		{
+			char x  = Character.toLowerCase(str[j]);
+			if(x < c)
+			{
+				char temp = str[i];
+				str[i] = str[j];
+				str[j] = temp;
+				i++;
+			}
+		}
+		char temp2 = str[i];
+		str[i] = str[r];
+		str[r] = temp2;
+		return i;
+	}
+}
